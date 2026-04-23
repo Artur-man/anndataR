@@ -412,9 +412,16 @@ write_zarr_string_array <- function(
     zarr_json_path <- file.path(store, name, "zarr.json")
     zarr_json <- jsonlite::read_json(zarr_json_path)
     zarr_json$data_type <- "string"
-    zarr_json$codecs <- c(
+    # There should be only one bytes-array codec
+    zarr_json$codecs <- lapply(
       zarr_json$codecs,
-      list(list(name = "vlen-utf8", configuration = list()))
+      function(codec) {
+         if (codec$name == "bytes") {
+           list(name = "vlen-utf8")
+         } else {
+           codec
+         }
+      }
     )
     jsonlite::write_json(
       zarr_json, 
@@ -542,9 +549,16 @@ write_zarr_string_scalar <- function(
     zarr_json_path <- file.path(store, name, "zarr.json")
     zarr_json <- jsonlite::read_json(zarr_json_path)
     zarr_json$data_type <- "string"
-    zarr_json$codecs <- c(
+    # There should be only one bytes-array codec
+    zarr_json$codecs <- lapply(
       zarr_json$codecs,
-      list(list(name = "vlen-utf8", configuration = list()))
+      function(codec) {
+         if (codec$name == "bytes") {
+           list(name = "vlen-utf8")
+         } else {
+           codec
+         }
+      }
     )
     jsonlite::write_json(
       zarr_json,
