@@ -18,7 +18,7 @@ as_AnnData(
   varp_mapping = TRUE,
   uns_mapping = TRUE,
   assay_name = NULL,
-  output_class = c("InMemory", "HDF5AnnData", "ReticulateAnnData"),
+  output_class = c("InMemory", "HDF5AnnData", "ZarrAnnData", "ReticulateAnnData"),
   ...
 )
 
@@ -34,7 +34,7 @@ as_AnnData(
   varp_mapping = TRUE,
   uns_mapping = TRUE,
   assay_name = TRUE,
-  output_class = c("InMemory", "HDF5AnnData", "ReticulateAnnData"),
+  output_class = c("InMemory", "HDF5AnnData", "ZarrAnnData", "ReticulateAnnData"),
   ...
 )
 
@@ -50,7 +50,7 @@ as_AnnData(
   varp_mapping = TRUE,
   uns_mapping = TRUE,
   assay_name = NULL,
-  output_class = c("InMemory", "HDF5AnnData", "ReticulateAnnData"),
+  output_class = c("InMemory", "HDF5AnnData", "ZarrAnnData", "ReticulateAnnData"),
   ...
 )
 }
@@ -243,7 +243,8 @@ as_AnnData(sce)
 \seealso{
 Other AnnData creators: 
 \code{\link{AnnData}()},
-\code{\link{read_h5ad}()}
+\code{\link{read_h5ad}()},
+\code{\link{read_zarr}()}
 
 Other object converters: 
 \code{\link{as_HDF5AnnData}()},
@@ -251,6 +252,7 @@ Other object converters:
 \code{\link{as_ReticulateAnnData}()},
 \code{\link{as_Seurat}()},
 \code{\link{as_SingleCellExperiment}()},
+\code{\link{as_ZarrAnnData}()},
 \code{\link{reticulate-helpers}}
 }
 \concept{AnnData creators}

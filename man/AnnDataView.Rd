@@ -34,7 +34,8 @@ Other AnnData classes:
 \code{\link{AbstractAnnData}},
 \code{\link{HDF5AnnData}},
 \code{\link{InMemoryAnnData}},
-\code{\link{ReticulateAnnData}}
+\code{\link{ReticulateAnnData}},
+\code{\link{ZarrAnnData}}
 }
 \concept{AnnData classes}
 \section{Super class}{
@@ -83,6 +84,7 @@ Other AnnData classes:
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="as_ReticulateAnnData"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-as_ReticulateAnnData'><code>anndataR::AbstractAnnData$as_ReticulateAnnData()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="as_Seurat"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-as_Seurat'><code>anndataR::AbstractAnnData$as_Seurat()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="as_SingleCellExperiment"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-as_SingleCellExperiment'><code>anndataR::AbstractAnnData$as_SingleCellExperiment()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="as_ZarrAnnData"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-as_ZarrAnnData'><code>anndataR::AbstractAnnData$as_ZarrAnnData()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="layers_keys"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-layers_keys'><code>anndataR::AbstractAnnData$layers_keys()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="n_obs"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-n_obs'><code>anndataR::AbstractAnnData$n_obs()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="n_vars"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-n_vars'><code>anndataR::AbstractAnnData$n_vars()</code></a></span></li>
@@ -96,6 +98,7 @@ Other AnnData classes:
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="varm_keys"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-varm_keys'><code>anndataR::AbstractAnnData$varm_keys()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="varp_keys"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-varp_keys'><code>anndataR::AbstractAnnData$varp_keys()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="write_h5ad"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-write_h5ad'><code>anndataR::AbstractAnnData$write_h5ad()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="anndataR" data-topic="AbstractAnnData" data-id="write_zarr"><a href='../../anndataR/html/AbstractAnnData.html#method-AbstractAnnData-write_zarr'><code>anndataR::AbstractAnnData$write_zarr()</code></a></span></li>
 </ul>
 </details>
 }}

@@ -20,7 +20,8 @@ Other AnnData classes:
 \code{\link{AnnDataView}},
 \code{\link{HDF5AnnData}},
 \code{\link{InMemoryAnnData}},
-\code{\link{ReticulateAnnData}}
+\code{\link{ReticulateAnnData}},
+\code{\link{ZarrAnnData}}
 }
 \concept{AnnData classes}
 \section{Active bindings}{
@@ -70,7 +71,9 @@ Other AnnData classes:
 \item \href{#method-AbstractAnnData-as_InMemoryAnnData}{\code{AbstractAnnData$as_InMemoryAnnData()}}
 \item \href{#method-AbstractAnnData-as_ReticulateAnnData}{\code{AbstractAnnData$as_ReticulateAnnData()}}
 \item \href{#method-AbstractAnnData-as_HDF5AnnData}{\code{AbstractAnnData$as_HDF5AnnData()}}
+\item \href{#method-AbstractAnnData-as_ZarrAnnData}{\code{AbstractAnnData$as_ZarrAnnData()}}
 \item \href{#method-AbstractAnnData-write_h5ad}{\code{AbstractAnnData$write_h5ad()}}
+\item \href{#method-AbstractAnnData-write_zarr}{\code{AbstractAnnData$write_zarr()}}
 \item \href{#method-AbstractAnnData-clone}{\code{AbstractAnnData$clone()}}
 }
 }
@@ -355,6 +358,36 @@ An \code{\link{HDF5AnnData}} object
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-AbstractAnnData-as_ZarrAnnData"></a>}}
+\if{latex}{\out{\hypertarget{method-AbstractAnnData-as_ZarrAnnData}{}}}
+\subsection{Method \code{as_ZarrAnnData()}}{
+Convert to a \code{\link{ZarrAnnData}}
+
+See \code{\link[=as_ZarrAnnData]{as_ZarrAnnData()}} for more details on the conversion
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AbstractAnnData$as_ZarrAnnData(
+  file,
+  compression = c("none", "gzip", "blosc", "zstd", "lzma", "bz2", "zlib", "lz4"),
+  mode = c("w-", "r", "r+", "a", "w", "x")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{See \code{\link[=as_ZarrAnnData]{as_ZarrAnnData()}}}
+
+\item{\code{compression}}{See \code{\link[=as_ZarrAnnData]{as_ZarrAnnData()}}}
+
+\item{\code{mode}}{See \code{\link[=as_ZarrAnnData]{as_ZarrAnnData()}}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{\link{ZarrAnnData}} object
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-AbstractAnnData-write_h5ad"></a>}}
 \if{latex}{\out{\hypertarget{method-AbstractAnnData-write_h5ad}{}}}
 \subsection{Method \code{write_h5ad()}}{
@@ -380,6 +413,36 @@ See \code{\link[=write_h5ad]{write_h5ad()}} for details
 \item{\code{chunk_size}}{See \code{\link[=write_h5ad]{write_h5ad()}}}
 
 \item{\code{mode}}{See \code{\link[=write_h5ad]{write_h5ad()}}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{path} invisibly
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-AbstractAnnData-write_zarr"></a>}}
+\if{latex}{\out{\hypertarget{method-AbstractAnnData-write_zarr}{}}}
+\subsection{Method \code{write_zarr()}}{
+Write the \code{AnnData} object to a Zarr file
+
+See \code{\link[=write_zarr]{write_zarr()}} for details
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{AbstractAnnData$write_zarr(
+  path,
+  compression = c("none", "gzip", "blosc", "zstd", "lzma", "bz2", "zlib", "lz4"),
+  mode = c("w-", "r", "r+", "a", "w", "x")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{See \code{\link[=write_zarr]{write_zarr()}}}
+
+\item{\code{compression}}{See \code{\link[=write_zarr]{write_zarr()}}}
+
+\item{\code{mode}}{See \code{\link[=write_zarr]{write_zarr()}}}
 }
 \if{html}{\out{</div>}}
 }

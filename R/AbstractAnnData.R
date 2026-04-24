@@ -290,6 +290,37 @@ AbstractAnnData <- R6::R6Class(
       )
     },
     #' @description
+    #' Convert to a [`ZarrAnnData`]
+    #'
+    #' See [as_ZarrAnnData()] for more details on the conversion
+    #'
+    #' @param file See [as_ZarrAnnData()]
+    #' @param compression See [as_ZarrAnnData()]
+    #' @param mode See [as_ZarrAnnData()]
+    #'
+    #' @return A [`ZarrAnnData`] object
+    as_ZarrAnnData = function(
+      file,
+      compression = c(
+        "none",
+        "gzip",
+        "blosc",
+        "zstd",
+        "lzma",
+        "bz2",
+        "zlib",
+        "lz4"
+      ),
+      mode = c("w-", "r", "r+", "a", "w", "x")
+    ) {
+      as_ZarrAnnData(
+        adata = self,
+        file = file,
+        compression = compression,
+        mode = mode
+      )
+    },
+    #' @description
     #' Write the `AnnData` object to an H5AD file
     #'
     #' See [write_h5ad()] for details
@@ -311,6 +342,37 @@ AbstractAnnData <- R6::R6Class(
         path,
         compression = compression,
         chunk_size = chunk_size,
+        mode = mode
+      )
+    },
+    #' @description
+    #' Write the `AnnData` object to a Zarr file
+    #'
+    #' See [write_zarr()] for details
+    #'
+    #' @param path See [write_zarr()]
+    #' @param compression See [write_zarr()]
+    #' @param mode See [write_zarr()]
+    #'
+    #' @return `path` invisibly
+    write_zarr = function(
+      path,
+      compression = c(
+        "none",
+        "gzip",
+        "blosc",
+        "zstd",
+        "lzma",
+        "bz2",
+        "zlib",
+        "lz4"
+      ),
+      mode = c("w-", "r", "r+", "a", "w", "x")
+    ) {
+      write_zarr(
+        object = self,
+        path,
+        compression = compression,
         mode = mode
       )
     }
