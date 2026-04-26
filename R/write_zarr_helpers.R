@@ -367,44 +367,80 @@ write_zarr_nullable_integer <- function(
 #' one of `"none"`, `"gzip"` or `"lzf"`. Defaults to `"none"`.
 #' @param version Encoding version of the element to write
 write_zarr_string_array <- function(
-  value,
-  store,
-  name,
-  compression,
-  version = "0.2.0"
+    value,
+    store,
+    name,
+    compression,
+    version = "0.2.0"
 ) {
   dims <- dim(value) %||% length(value)
-
+  
   # replace NA to "NA" (as in rhdf5:::.h5postProcessDataset)
   # to read as "NA" -> NA later after Rarr:read_zarr_array
   value[is.na(value)] <- "NA"
-
-  if (any(dims == 0)) {
-    Rarr::create_empty_zarr_array(
-      file.path(store, name),
-      dim = dims,
-      chunk_dim = dims,
-      data_type = "<U",
-      nchar = 1,
-      compressor = .get_compressor(compression),
-      zarr_version = 2L
+  
+  zarr_version <- 2L
+  
+  Rarr::create_empty_zarr_array(
+    file.path(store, name),
+    dim = dims,
+    chunk_dim = dims,
+    order = if (length(dims) > 1) "C" else "F",
+    data_type = "|O",
+    compressor = .get_compressor(compression),
+    zarr_version = zarr_version
+  )
+  # Rarr doesn't yet provide an explicit interface to deal with VLen-UTF8 so
+  # we patch the metadata by hand.
+  # Will be resolved by https://github.com/Huber-group-EMBL/Rarr/issues/111.
+  if (zarr_version == 2L) {
+    zarr_json_path <- file.path(store, name, ".zarray")
+    zarr_json <- jsonlite::read_json(zarr_json_path)
+    zarr_json$filters <- c(
+      zarr_json$filters,
+      list(list(id = "vlen-utf8"))
     )
-  } else {
-    data <- array(data = value, dim = dims)
-    Rarr::write_zarr_array(
-      data,
-      zarr_array_path = file.path(store, name),
-      chunk_dim = dims,
-      order = if (length(dims) > 1) "C" else "F",
-      # TODO: string arrays require vlen-utf8 filter support
-      # see https://github.com/Huber-group-EMBL/Rarr/issues/98
-      data_type = "<U",
-      nchar = max(nchar(value)),
-      compressor = .get_compressor(compression),
-      zarr_version = 2L
+    jsonlite::write_json(
+      zarr_json, 
+      zarr_json_path, 
+      auto_unbox = TRUE, 
+      pretty = TRUE, 
+      null = "null"
     )
   }
-
+  if (zarr_version == 3L) {
+    zarr_json_path <- file.path(store, name, "zarr.json")
+    zarr_json <- jsonlite::read_json(zarr_json_path)
+    zarr_json$data_type <- "string"
+    # There should be only one bytes-array codec
+    zarr_json$codecs <- lapply(
+      zarr_json$codecs,
+      function(codec) {
+        if (codec$name == "bytes") {
+          list(name = "vlen-utf8", configuration = list())
+        } else {
+          codec
+        }
+      }
+    )
+    jsonlite::write_json(
+      zarr_json, 
+      zarr_json_path, 
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      null = "null"
+    )
+  }
+  
+  if (all(dims != 0)) {
+    data <- array(data = value, dim = dims)
+    Rarr::update_zarr_array(
+      data,
+      zarr_array_path = file.path(store, name),
+      index = lapply(dims, seq_len)
+    )
+  }
+  
   write_zarr_encoding(store, name, "string-array", version)
 }
 
@@ -474,22 +510,70 @@ write_zarr_categorical <- function(
 #' one of `"none"`, `"gzip"` or `"lzf"`. Defaults to `"none"`.
 #' @param version Encoding version of the element to write
 write_zarr_string_scalar <- function(
-  value,
-  store,
-  name,
-  compression,
-  version = "0.2.0"
+    value,
+    store,
+    name,
+    compression,
+    version = "0.2.0"
 ) {
   # Write scalar
+  zarr_version <- 2L
   value <- array(data = value, dim = 1)
-  Rarr::write_zarr_array(
-    value,
+  Rarr::create_empty_zarr_array(
     zarr_array_path = file.path(store, name),
+    data_type = "|O",
+    dim = 1,
     chunk_dim = 1,
     compressor = .get_compressor(compression),
-    zarr_version = 2L
+    zarr_version = zarr_version
   )
-
+  # Rarr doesn't yet provide an explicit interface to deal with VLen-UTF8 so
+  # we patch the metadata by hand.
+  # Will be resolved by https://github.com/Huber-group-EMBL/Rarr/issues/111.
+  if (zarr_version == 2L) {
+    zarr_json_path <- file.path(store, name, ".zarray")
+    zarr_json <- jsonlite::read_json(zarr_json_path)
+    # There should be only one bytes-array codec
+    zarr_json$codecs <- lapply(
+      zarr_json$codecs,
+      function(codec) {
+        if (codec$name == "bytes") {
+          list(name = "vlen-utf8", configuration = list())
+        } else {
+          codec
+        }
+      }
+    )
+    jsonlite::write_json(
+      zarr_json,
+      zarr_json_path,
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      null = "null"
+    )
+  }
+  if (zarr_version == 3L) {
+    zarr_json_path <- file.path(store, name, "zarr.json")
+    zarr_json <- jsonlite::read_json(zarr_json_path)
+    zarr_json$data_type <- "string"
+    zarr_json$codecs <- c(
+      zarr_json$codecs,
+      list(list(name = "vlen-utf8", configuration = list()))
+    )
+    jsonlite::write_json(
+      zarr_json,
+      zarr_json_path,
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      null = "null"
+    )
+  }
+  Rarr::update_zarr_array(
+    value,
+    zarr_array_path = file.path(store, name),
+    index = list(1)
+  )
+  
   # Write attributes
   write_zarr_encoding(store, name, "string", version)
 }
