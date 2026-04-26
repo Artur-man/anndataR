@@ -2,13 +2,13 @@
 #'
 #' Get a list of backend-specific values for a given file format
 #'
-#' @param fmt Either `"h5ad"` or `"zarr"`
+#' @param fmt Either `"h5ad"`, `"zarr_v2"` or `"zarr_v3"`
 #' @return A named list with elements: `backend`, `ext`, `r_read_fun`,
 #'   `r_write_fun`, `py_read_method`, `py_write_method`
-get_fmt_config <- function(fmt = c("h5ad", "zarr")) {
+get_fmt_config <- function(fmt = c("h5ad", "zarr_v2", "zarr_v3")) {
   fmt <- match.arg(fmt)
-
-  if (fmt == "zarr") {
+  
+  if (fmt == "zarr_v2") {
     skip_if_no_zarr() # nolint: object_usage_linter
     list(
       backend = "ZarrAnnData",
@@ -16,7 +16,19 @@ get_fmt_config <- function(fmt = c("h5ad", "zarr")) {
       r_read_fun = read_zarr,
       r_write_fun = write_zarr,
       py_read_method = "read_zarr",
-      py_write_method = "write_zarr"
+      py_write_method = "write_zarr",
+      zarr_version = 2
+    )
+  } else if (fmt == "zarr_v3") {
+    skip_if_no_zarr() # nolint: object_usage_linter
+    list(
+      backend = "ZarrAnnData",
+      ext = ".zarr",
+      r_read_fun = read_zarr,
+      r_write_fun = write_zarr,
+      py_read_method = "read_zarr",
+      py_write_method = "write_zarr",
+      zarr_version = 3
     )
   } else {
     list(
@@ -40,9 +52,9 @@ get_fmt_config <- function(fmt = c("h5ad", "zarr")) {
 expect_anndata_print_equal <- function(adata_r, adata_py) {
   str_r <- capture.output(print(adata_r))
   str_py <- capture.output(print(adata_py))
-
+  
   # Normalise class names in R output to match Python output
   str_r <- gsub("[^ ]*AnnData", "AnnData", str_r)
-
+  
   testthat::expect_equal(str_r, str_py)
 }

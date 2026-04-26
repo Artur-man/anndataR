@@ -12,7 +12,7 @@ ZARR_METADATA_FILES <- c(".zarray", ".zattrs", ".zgroup", "zarr.json")
 #' @return `NULL`
 #'
 #' @noRd
-create_zarr_group <- function(store, name, version = "v2") {
+create_zarr_group <- function(store, name, version = .get_zarr_version()) {
   # Split "a/b/c" into c("a", "b", "c")
   split_name <- strsplit(name, split = "/", fixed = TRUE)[[1]]
   if (length(split_name) > 1) {
@@ -32,17 +32,20 @@ create_zarr_group <- function(store, name, version = "v2") {
   }
   dir.create(file.path(store, split_name[1]), showWarnings = FALSE)
   switch(
-    version,
-    v2 = {
+    as.character(version),
+    "2" = {
       write(
         "{\"zarr_format\":2}",
         file = file.path(store, split_name[1], ".zgroup")
       )
     },
-    v3 = {
-      cli_abort("Currently only zarr v2 is supported!")
+    "3" = {
+      write(
+        "{\"zarr_format\": 3,\n\"node_type\": \"group\"}",
+        file = file.path(store, split_name[1], "zarr.json")
+      )
     },
-    cli_abort("Only zarr v2 is supported. Use version = 'v2'")
+    cli_abort("Incorrect Zarr version specified. Must be '2' or '3'.")
   )
 }
 
@@ -56,7 +59,7 @@ create_zarr_group <- function(store, name, version = "v2") {
 #' @return `NULL`
 #'
 #' @noRd
-create_zarr <- function(store, version = "v2") {
+create_zarr <- function(store, version = .get_zarr_version()) {
   prefix <- basename(store)
   dir <- gsub(paste0(prefix, "$"), "", store)
   create_zarr_group(store = dir, name = prefix, version = version)
@@ -102,4 +105,9 @@ zarr_path_exists <- function(store, target_path) {
       FALSE
     }
   }
+}
+
+.get_zarr_version <- function(){
+  vr <- getOption("anndataR.zarr_version")
+  if(is.null(vr)) "2" else vr
 }

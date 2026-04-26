@@ -30,6 +30,7 @@ write_zarr_element <- function(
     "zlib",
     "lz4"
   ),
+  zarr_version = .get_zarr_version(),
   stop_on_error = FALSE,
   ...
 ) {
@@ -98,6 +99,7 @@ write_zarr_element <- function(
         store = store,
         name = name,
         compression = compression,
+        zarr_version = zarr_version,
         ...
       )
     },
@@ -130,10 +132,12 @@ write_zarr_element <- function(
 #' @param name Name of the element within the Zarr store
 #' @param encoding The encoding type to set
 #' @param version The encoding version to set
-write_zarr_encoding <- function(store, name, encoding, version) {
+#' @param zarr_version zarr version
+write_zarr_encoding <- function(store, name, encoding, version, zarr_version) {
   Rarr::write_zarr_attributes(
     file.path(store, name),
-    new.zattrs = list(`encoding-type` = encoding, `encoding-version` = version)
+    new.zattrs = list(`encoding-type` = encoding, `encoding-version` = version),
+    zarr_version = zarr_version
   )
 }
 
@@ -153,7 +157,8 @@ write_zarr_null <- function(
   store,
   name,
   compression,
-  version = "0.1.0"
+  version = "0.1.0",
+  zarr_version = .get_zarr_version()
 ) {
   if (isFALSE(getOption("anndataR.write_null", "TRUE"))) {
     return(invisible(NULL))
@@ -167,7 +172,7 @@ write_zarr_null <- function(
     zarr_version = 2L
   )
 
-  write_zarr_encoding(store, name, "null", version)
+  write_zarr_encoding(store, name, "null", version, zarr_version)
 }
 
 #' Write Zarr dense array
@@ -187,6 +192,7 @@ write_zarr_dense_array <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.2.0"
 ) {
   version <- match.arg(version)
@@ -200,11 +206,12 @@ write_zarr_dense_array <- function(
     store,
     name,
     value,
-    compression
+    compression,
+    zarr_version
   )
 
   # Write attributes
-  write_zarr_encoding(store, name, "array", version)
+  write_zarr_encoding(store, name, "array", version, zarr_version)
 }
 
 #' Write Zarr sparse array
@@ -224,6 +231,7 @@ write_zarr_sparse_array <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.1.0"
 ) {
   version <- match.arg(version)
@@ -250,23 +258,26 @@ write_zarr_sparse_array <- function(
     store,
     paste0(name, "/indices"),
     attr(value, indices_attr),
-    compression
+    compression,
+    zarr_version
   )
   zarr_write_compressed(
     store,
     paste0(name, "/indptr"),
     value@p,
-    compression
+    compression,
+    zarr_version
   )
   zarr_write_compressed(
     store,
     paste0(name, "/data"),
     value@x,
-    compression
+    compression,
+    zarr_version
   )
 
   # Add encoding
-  write_zarr_encoding(store, name, type, version)
+  write_zarr_encoding(store, name, type, version, zarr_version)
 
   # Write shape attribute
   Rarr::write_zarr_attributes(file.path(store, name), list(shape = dim(value)))
@@ -289,6 +300,7 @@ write_zarr_nullable_boolean <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.1.0"
 ) {
   # write mask and values
@@ -300,17 +312,19 @@ write_zarr_nullable_boolean <- function(
     store,
     paste0(name, "/values"),
     value_no_na,
-    compression
+    compression,
+    zarr_version
   )
   zarr_write_compressed(
     store,
     paste0(name, "/mask"),
     is.na(value),
-    compression
+    compression,
+    zarr_version
   )
 
   # Write attributes
-  write_zarr_encoding(store, name, "nullable-boolean", version)
+  write_zarr_encoding(store, name, "nullable-boolean", version, zarr_version)
 }
 
 #' Write Zarr nullable integer
@@ -330,6 +344,7 @@ write_zarr_nullable_integer <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.1.0"
 ) {
   # write mask and values
@@ -341,17 +356,19 @@ write_zarr_nullable_integer <- function(
     store,
     paste0(name, "/values"),
     value_no_na,
-    compression
+    compression,
+    zarr_version
   )
   zarr_write_compressed(
     store,
     paste0(name, "/mask"),
     is.na(value),
-    compression
+    compression,
+    zarr_version
   )
 
   # Write attributes
-  write_zarr_encoding(store, name, "nullable-integer", version)
+  write_zarr_encoding(store, name, "nullable-integer", version, zarr_version)
 }
 
 #' Write Zarr string array
@@ -371,6 +388,7 @@ write_zarr_string_array <- function(
     store,
     name,
     compression,
+    zarr_version = .get_zarr_version(),
     version = "0.2.0"
 ) {
   dims <- dim(value) %||% length(value)
@@ -441,7 +459,7 @@ write_zarr_string_array <- function(
     )
   }
   
-  write_zarr_encoding(store, name, "string-array", version)
+  write_zarr_encoding(store, name, "string-array", version, zarr_version)
 }
 
 #' Write Zarr categorical
@@ -461,6 +479,7 @@ write_zarr_categorical <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.2.0"
 ) {
   create_zarr_group(store, name)
@@ -487,7 +506,8 @@ write_zarr_categorical <- function(
     store = store,
     name = name,
     encoding = "categorical",
-    version = version
+    version = version, 
+    zarr_version = zarr_version
   )
 
   # Write ordered attribute
@@ -514,6 +534,7 @@ write_zarr_string_scalar <- function(
     store,
     name,
     compression,
+    zarr_version = .get_zarr_version(),
     version = "0.2.0"
 ) {
   # Write scalar
@@ -575,7 +596,7 @@ write_zarr_string_scalar <- function(
   )
   
   # Write attributes
-  write_zarr_encoding(store, name, "string", version)
+  write_zarr_encoding(store, name, "string", version, zarr_version)
 }
 
 #' Write Zarr numeric scalar
@@ -595,13 +616,14 @@ write_zarr_numeric_scalar <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.2.0"
 ) {
   # Write scalar
-  zarr_write_compressed(store, name, value, compression)
+  zarr_write_compressed(store, name, value, compression, zarr_version)
 
   # Write attributes
-  write_zarr_encoding(store, name, "numeric-scalar", version)
+  write_zarr_encoding(store, name, "numeric-scalar", version, zarr_version)
 }
 
 #' Write Zarr mapping
@@ -621,6 +643,7 @@ write_zarr_mapping <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.1.0"
 ) {
   create_zarr_group(store, name)
@@ -635,7 +658,7 @@ write_zarr_mapping <- function(
     )
   }
 
-  write_zarr_encoding(store, name, "dict", version)
+  write_zarr_encoding(store, name, "dict", version, zarr_version)
 }
 
 #' Write Zarr data frame
@@ -658,11 +681,12 @@ write_zarr_data_frame <- function(
   store,
   name,
   compression,
+  zarr_version = .get_zarr_version(),
   index = NULL,
   version = "0.2.0"
 ) {
-  create_zarr_group(store, name)
-  write_zarr_encoding(store, name, "dataframe", version)
+  create_zarr_group(store, name, zarr_version)
+  write_zarr_encoding(store, name, "dataframe", version, zarr_version)
 
   if (is.null(index)) {
     index_name <- "_index"
@@ -742,31 +766,32 @@ write_empty_zarr <- function(
   obs,
   var,
   compression,
+  zarr_version = .get_zarr_version(),
   version = "0.1.0"
 ) {
   create_zarr(store = store)
-  write_zarr_encoding(store, "/", "anndata", "0.1.0")
+  write_zarr_encoding(store, "/", "anndata", "0.1.0", zarr_version)
 
-  write_zarr_element(obs[, integer(0)], store, "/obs", compression)
-  write_zarr_element(var[, integer(0)], store, "/var", compression)
+  write_zarr_element(obs[, integer(0)], store, "/obs", compression, zarr_version)
+  write_zarr_element(var[, integer(0)], store, "/var", compression, zarr_version)
 
-  create_zarr_group(store, "layers")
-  write_zarr_encoding(store, "/layers", "dict", "0.1.0")
+  create_zarr_group(store, "layers", zarr_version)
+  write_zarr_encoding(store, "/layers", "dict", "0.1.0", zarr_version)
 
-  create_zarr_group(store, "obsm")
-  write_zarr_encoding(store, "/obsm", "dict", "0.1.0")
+  create_zarr_group(store, "obsm", zarr_version)
+  write_zarr_encoding(store, "/obsm", "dict", "0.1.0", zarr_version)
 
-  create_zarr_group(store, "obsp")
-  write_zarr_encoding(store, "/obsp", "dict", "0.1.0")
+  create_zarr_group(store, "obsp", zarr_version)
+  write_zarr_encoding(store, "/obsp", "dict", "0.1.0", zarr_version)
 
-  create_zarr_group(store, "uns")
-  write_zarr_encoding(store, "/uns", "dict", "0.1.0")
+  create_zarr_group(store, "uns", zarr_version)
+  write_zarr_encoding(store, "/uns", "dict", "0.1.0", zarr_version)
 
-  create_zarr_group(store, "varm")
-  write_zarr_encoding(store, "/varm", "dict", "0.1.0")
+  create_zarr_group(store, "varm", zarr_version)
+  write_zarr_encoding(store, "/varm", "dict", "0.1.0", zarr_version)
 
-  create_zarr_group(store, "varp")
-  write_zarr_encoding(store, "/varp", "dict", "0.1.0")
+  create_zarr_group(store, "varp", zarr_version)
+  write_zarr_encoding(store, "/varp", "dict", "0.1.0", zarr_version)
 }
 
 #' Zarr write compressed
@@ -788,7 +813,8 @@ zarr_write_compressed <- function(
   store,
   name,
   value,
-  compression = c("none", "gzip", "blosc", "zstd", "lzma", "bz2", "zlib", "lz4")
+  compression = c("none", "gzip", "blosc", "zstd", "lzma", "bz2", "zlib", "lz4"),
+  zarr_version = .get_zarr_version()
 ) {
   dims <- dim(value) %||% length(value)
   data <- array(data = value, dim = dims)
@@ -798,7 +824,7 @@ zarr_write_compressed <- function(
     chunk_dim = dims,
     order = if (length(dims) > 1) "C" else "F",
     compressor = .get_compressor(compression),
-    zarr_version = 2L
+    zarr_version = zarr_version
   )
 }
 
