@@ -1,3 +1,7 @@
+# anndataR 1.2.0
+
+- Bioconductor 3.23 release
+
 # anndataR 1.1.3
 
 - Prepare for Bioconductor 3.23 release (PR #449).
