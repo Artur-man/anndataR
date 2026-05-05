@@ -1,3 +1,7 @@
+# anndata 1.3.0
+
+- Bioconductor 3.24 devel
+
 # anndataR 1.2.0
 
 - Bioconductor 3.23 release
