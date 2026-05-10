@@ -136,7 +136,6 @@ write_zarr_encoding <- function(store, name, encoding, version, zarr_version) {
   Rarr::write_zarr_attributes(
     file.path(store, name),
     new.zattrs = list(`encoding-type` = encoding, `encoding-version` = version),
-    zarr_version = zarr_version
   )
 }
 
