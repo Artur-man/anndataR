@@ -10,12 +10,21 @@ tryCatch(ad$settings$allow_write_nullable_strings <- TRUE, error = function(e) {
 })
 bi <- reticulate::import_builtins()
 
+# suppress ZarrUserWarnings
+wr <- reticulate::import("warnings")
+wr$filterwarnings("ignore")
+
 known_issues <- read_known_issues()
 
 name <- "empty"
 
-for (fmt in c("h5ad", "zarr")) {
+for (fmt in c("h5ad", "zarrv2", "zarrv3")) {
   fmt_config <- get_fmt_config(fmt)
+
+  if (grepl("zarr", fmt_config$ext)) {
+    options(anndataR.zarr_version = fmt_config$zarr_version)
+    ad$settings$zarr_write_format <- fmt_config$zarr_version
+  }
 
   # first generate a python adata
   adata_py <- ad$AnnData()

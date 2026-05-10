@@ -1,14 +1,14 @@
 skip_if_not_installed("Rarr")
 
-for (zarr_version in c("v2", "v3")) {
+for (zarr_version in c(2, 3)) {
   zarr_zip <- system.file(
     "extdata",
-    paste0("example_", zarr_version, ".zarr.zip"),
+    paste0("example_v", zarr_version, ".zarr.zip"),
     package = "anndataR"
   )
   td <- tempdir(check = TRUE)
   unzip(zarr_zip, exdir = td)
-  store <- file.path(td, paste0("example_", zarr_version, ".zarr"))
+  store <- file.path(td, paste0("example_v", zarr_version, ".zarr"))
 
   test_that(paste("reading Zarr", zarr_version, "encoding works"), {
     encoding <- read_zarr_encoding(store, "obs")

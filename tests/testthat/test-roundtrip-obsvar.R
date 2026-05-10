@@ -7,12 +7,21 @@ ad <- reticulate::import("anndata", convert = FALSE)
 da <- reticulate::import("dummy_anndata", convert = FALSE)
 bi <- reticulate::import_builtins()
 
+# suppress ZarrUserWarnings
+wr <- reticulate::import("warnings")
+wr$filterwarnings("ignore")
+
 known_issues <- read_known_issues()
 
 test_names <- names(da$vector_generators)
 
-for (fmt in c("h5ad", "zarr")) {
+for (fmt in c("h5ad", "zarrv2", "zarrv3")) {
   fmt_config <- get_fmt_config(fmt)
+
+  if (grepl("zarr", fmt_config$ext)) {
+    options(anndataR.zarr_version = fmt_config$zarr_version)
+    ad$settings$zarr_write_format <- fmt_config$zarr_version
+  }
 
   for (name in test_names) {
     # first generate a python adata

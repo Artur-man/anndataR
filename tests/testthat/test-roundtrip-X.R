@@ -7,6 +7,10 @@ ad <- reticulate::import("anndata", convert = FALSE)
 da <- reticulate::import("dummy_anndata", convert = FALSE)
 bi <- reticulate::import_builtins()
 
+# suppress ZarrUserWarnings
+wr <- reticulate::import("warnings")
+wr$filterwarnings("ignore")
+
 known_issues <- read_known_issues()
 
 test_names <- names(da$matrix_generators)
@@ -15,8 +19,13 @@ test_names <- names(da$matrix_generators)
 # -> https://github.com/scverse/anndata/blob/2a2c0e3198c298a5c80a73ac343c63203b5ca133/src/anndata/_core/anndata.py#L2164-L2172 # nolint
 test_names <- test_names[!grepl("_3d$", test_names)]
 
-for (fmt in c("h5ad", "zarr")) {
+for (fmt in c("h5ad", "zarrv2", "zarrv3")) {
   fmt_config <- get_fmt_config(fmt)
+
+  if (grepl("zarr", fmt_config$ext)) {
+    options(anndataR.zarr_version = fmt_config$zarr_version)
+    ad$settings$zarr_write_format <- fmt_config$zarr_version
+  }
 
   for (name in test_names) {
     # first generate a python adata

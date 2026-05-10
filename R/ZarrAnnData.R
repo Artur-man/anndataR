@@ -20,6 +20,7 @@ ZarrAnnData <- R6::R6Class(
   cloneable = FALSE,
   private = list(
     .zarrobj = NULL,
+    .zarrversion = NULL,
     .compression = NULL,
     .readonly = NULL,
 
@@ -62,7 +63,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "X",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -87,7 +89,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "layers",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -114,7 +117,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "obsm",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -141,7 +145,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "varm",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -166,7 +171,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "obsp",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -191,7 +197,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "varp",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -209,7 +216,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "obs",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -227,7 +235,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "var",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     },
@@ -275,7 +284,8 @@ ZarrAnnData <- R6::R6Class(
           write_zarr_element(
             private$.zarrobj,
             "uns",
-            private$.compression
+            private$.compression,
+            private$.zarrversion
           )
       }
     }
@@ -308,28 +318,29 @@ ZarrAnnData <- R6::R6Class(
     #' create a new one. If any additional slot arguments are set an existing
     #' file will be overwritten.
     initialize = function(
-      file,
-      X = NULL,
-      obs = NULL,
-      var = NULL,
-      layers = NULL,
-      obsm = NULL,
-      varm = NULL,
-      obsp = NULL,
-      varp = NULL,
-      uns = NULL,
-      shape = NULL,
-      mode = c("a", "r", "r+", "w", "w-", "x"),
-      compression = c(
-        "none",
-        "gzip",
-        "blosc",
-        "zstd",
-        "lzma",
-        "bz2",
-        "zlib",
-        "lz4"
-      )
+    file,
+    X = NULL,
+    obs = NULL,
+    var = NULL,
+    layers = NULL,
+    obsm = NULL,
+    varm = NULL,
+    obsp = NULL,
+    varp = NULL,
+    uns = NULL,
+    shape = NULL,
+    mode = c("a", "r", "r+", "w", "w-", "x"),
+    compression = c(
+      "none",
+      "gzip",
+      "blosc",
+      "zstd",
+      "lzma",
+      "bz2",
+      "zlib",
+      "lz4"
+    ),
+    zarr_version = .get_zarr_version()
     ) {
       check_requires("ZarrAnnData", "Rarr", where = "Bioc")
 
@@ -338,6 +349,7 @@ ZarrAnnData <- R6::R6Class(
 
       private$.compression <- compression
 
+      private$.zarrversion <- zarr_version
       is_readonly <- FALSE
 
       if (is.character(file)) {
@@ -520,7 +532,7 @@ ZarrAnnData <- R6::R6Class(
 #'
 # nolint start: object_name_linter
 as_ZarrAnnData <- function(
-  # nolint end: object_name_linter
+    # nolint end: object_name_linter
   adata,
   file,
   compression = c(
@@ -555,6 +567,7 @@ as_ZarrAnnData <- function(
     uns = adata$uns,
     shape = adata$shape(),
     mode = mode,
-    compression = compression
+    compression = compression,
+    zarr_version = .get_zarr_version()
   )
 }
