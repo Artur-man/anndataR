@@ -92,8 +92,8 @@ jobs:
           install.packages(c("BiocManager", "remotes"), quiet = TRUE)
           ## update=FALSE avoids calling old.packages(type="both") which
           ## triggers the R-devel bug in .available.both() (commit dd03406)
-          BiocManager::install(version = "3.23", ask = FALSE, update = FALSE)
-          cat("R_BIOC_VERSION=3.23\n", file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+          BiocManager::install(version = "devel", ask = FALSE, update = FALSE)
+          cat("R_BIOC_VERSION=3.24\n", file = Sys.getenv("GITHUB_ENV"), append = TRUE)
 
       - name: Install pandoc
         uses: r-lib/actions/setup-pandoc@v2
