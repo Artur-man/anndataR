@@ -31,15 +31,16 @@ create_zarr_group <- function(store, name, version = .get_zarr_version()) {
     }
   }
   dir.create(file.path(store, split_name[1]), showWarnings = FALSE)
+  version <- paste0("v", version)
   switch(
-    as.character(version),
-    "2" = {
+    version,
+    v2 = {
       write(
         "{\"zarr_format\":2}",
         file = file.path(store, split_name[1], ".zgroup")
       )
     },
-    "3" = {
+    v3 = {
       write(
         "{\"zarr_format\": 3,\n\"node_type\": \"group\"}",
         file = file.path(store, split_name[1], "zarr.json")
